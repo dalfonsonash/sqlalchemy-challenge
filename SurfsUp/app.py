@@ -44,6 +44,8 @@ def index():
          <h1>Welcome to the Climate API!</h1>
         <h2>Available Routes:</h2>
         <ul>
+            <li><a href="/api/v1.0/about">/api/v1.0/about</a></li>
+            <li><a href="/api/v1.0/contact">/api/v1.0/contact</a></li>
             <li><a href="/api/v1.0/precipitation">/api/v1.0/precipitation</a></li>
             <li><a href="/api/v1.0/stations">/api/v1.0/stations</a></li>
             <li><a href="/api/v1.0/tobs">/api/v1.0/tobs</a></li>
@@ -53,18 +55,21 @@ def index():
     """
 @app.route("/about")
 def about():
+    session=Session(engine)
     name = "Dave"
     location = "Granite Bay"
+    session.close()
 
     return f"My name is {name}, and I live in {location}."
 
-
+    
 @app.route("/contact")
 def contact():
+    session=Session(engine)
     email = "dalfonsonash@outlook.com"
-
+    session.close()
+    
     return f"Questions? Comments? Complaints? Shoot an email to {email}."
-
 
 # Define the precipitation route
 @app.route("/api/v1.0/precipitation")
@@ -139,6 +144,10 @@ def start(start):
         
     return jsonify(tobsall)
 
+# If no data is available, return an error message
+    return jsonify({"error": f"No temperature data found for the specified start date '{start}'"}), 404
+
+
 @app.route('/api/v1.0/<start>/<end>')
 def start_end(start,end):
     queryresult = session.query(func.min(Measurement.tobs), func.avg(Measurement.tobs),\
@@ -156,6 +165,9 @@ def start_end(start,end):
         tobsall.append(tobs_dict)
 
     return jsonify(tobsall)
+
+# If no data is available, return an error message
+    return jsonify({"error": f"No temperature data found for the specified start date '{start}' and end date '{end}'"}), 404
 
 # Run the server
 if __name__ == "__main__":
