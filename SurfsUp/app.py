@@ -40,15 +40,31 @@ app = Flask(__name__)
 # Define the index route
 @app.route("/")
 def index():
-    return """
-        Welcome to the Climate API!<br/>
-        Available Routes:<br/>
-        /api/v1.0/precipitation<br/>
-        /api/v1.0/stations<br/>
-        /api/v1.0/tobs<br/>
-        /api/v1.0/<start><br/>
-        /api/v1.0/<start>/<end>
+    return """ 
+         <h1>Welcome to the Climate API!</h1>
+        <h2>Available Routes:</h2>
+        <ul>
+            <li><a href="/api/v1.0/precipitation">/api/v1.0/precipitation</a></li>
+            <li><a href="/api/v1.0/stations">/api/v1.0/stations</a></li>
+            <li><a href="/api/v1.0/tobs">/api/v1.0/tobs</a></li>
+            <li><a href="/api/v1.0/start_date">/api/v1.0/start_date</a></li>
+            <li><a href="/api/v1.0/start_end_date">/api/v1.0/start_end_date</a></li>
+        </ul>
     """
+@app.route("/about")
+def about():
+    name = "Dave"
+    location = "Granite Bay"
+
+    return f"My name is {name}, and I live in {location}."
+
+
+@app.route("/contact")
+def contact():
+    email = "dalfonsonash@outlook.com"
+
+    return f"Questions? Comments? Complaints? Shoot an email to {email}."
+
 
 # Define the precipitation route
 @app.route("/api/v1.0/precipitation")
@@ -106,65 +122,40 @@ def tobs():
     return jsonify(tobs_list)
 
 # Define the start and start/end date routes
-@app.route("/api/v1.0/start_date/<start>")
-def start_date(start):
-    try:
-        start_date = dt.datetime.strptime(start, "%Y-%m-%d").date()
-    except ValueError:
-        return jsonify({"error": "Invalid date format. Please use YYYY-MM-DD."}), 400
-
-    session = Session(engine)
-    
-    # Perform the necessary calculations using the specified start date
-    results = session.query(func.min(Measurement.tobs), func.avg(Measurement.tobs), func.max(Measurement.tobs)).\
-              filter(Measurement.date >= start).all()
+@app.route("/api/v1.0/<start>")
+def start(start):
+    result = session.query(func.min(Measurement.tobs), func.avg(Measurement.tobs),\
+                                func.max(Measurement.tobs)).filter(Measurement.date >= start).all()
     
     session.close()
-    
-    # Check if any data is available for the specified start date
-    if results:
-        # Create a dictionary with the calculated values
-        temp_data = {
-            "TMIN": results[0][0],
-            "TAVG": results[0][1],
-            "TMAX": results[0][2]
-        }
+    tobsall = []
+
+    for min,avg,max in result:
+        tobs_dict = {}
+        tobs_dict["Min"] = min
+        tobs_dict["Average"] = avg
+        tobs_dict["Max"] = max
+        tobsall.append(tobs_dict)
         
-        return jsonify(temp_data)
-    
-    # If no data is available, return an error message
-    return jsonify({"error": f"No temperature data found for the specified start date '{start}'"}), 404
+    return jsonify(tobsall)
 
+@app.route('/api/v1.0/<start>/<end>')
+def start_end(start,end):
+    queryresult = session.query(func.min(Measurement.tobs), func.avg(Measurement.tobs),\
+                func.max(Measurement.tobs)).filter(Measurement.date >= start).\
+                filter(Measurement.date <= end).all()
 
-@app.route("/api/v1.0/start_end_date/<start>/<end>")
-def start_end_date(start, end):
-    try:
-        start_date = dt.datetime.strptime(start, "%Y-%m-%d").date()
-        end_date = dt.datetime.strptime(end, "%Y-%m-%d").date()
-    except ValueError:
-        return jsonify({"error": "Invalid date format. Please use YYYY-MM-DD."}), 400
-    
-    session = Session(engine)
-    
-    # Perform the necessary calculations using the specified start and end dates
-    results = session.query(func.min(Measurement.tobs), func.avg(Measurement.tobs), func.max(Measurement.tobs)).\
-              filter(Measurement.date >= start, Measurement.date <= end).all()
-    
     session.close()
-    
-    # Check if any data is available for the specified start and end dates
-    if results:
-        # Create a dictionary with the calculated values
-        temp_data = {
-            "TMIN": results[0][0],
-            "TAVG": results[0][1],
-            "TMAX": results[0][2]
-        }
-        
-        return jsonify(temp_data)
-    
-    # If no data is available, return an error message
-    return jsonify({"error": f"No temperature data found for the specified start date '{start}' and end date '{end}'"}), 404
+
+    tobsall = []
+    for min,avg,max in queryresult:
+        tobs_dict = {}
+        tobs_dict["Min"] = min
+        tobs_dict["Average"] = avg
+        tobs_dict["Max"] = max
+        tobsall.append(tobs_dict)
+
+    return jsonify(tobsall)
 
 # Run the server
 if __name__ == "__main__":
