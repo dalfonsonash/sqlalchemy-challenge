@@ -49,10 +49,12 @@ def index():
             <li><a href="/api/v1.0/precipitation">/api/v1.0/precipitation</a></li>
             <li><a href="/api/v1.0/stations">/api/v1.0/stations</a></li>
             <li><a href="/api/v1.0/tobs">/api/v1.0/tobs</a></li>
-            <li><a href="/api/v1.0/temp/<start>">/api/v1.0/<start></a></li>
-            <li><a href="/api/v1.0/temp/<start>/<end>">/api/v1.0/<start>/<end></a></li>
         </ul>
+        <h4>To find average temp on a specific date use: http://127.0.0.1:5000/api/v1.0/"YYYY-MM-DD"</h4>
+        <h4>To find average temp between a start and end date use: http://127.0.0.1:5000/api/v1.0/"YYYY-MM-DD/YYYY-MM-DD"</h4>
     """
+#<li><a href="/api/v1.0/temp/<start>">/api/v1.0/<start></a></li>
+#<li><a href="/api/v1.0/temp/<start>/<end>">/api/v1.0/<start>/<end></a></li>
 @app.route("/about")
 def about():
     session=Session(engine)
