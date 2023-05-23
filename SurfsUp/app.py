@@ -44,13 +44,13 @@ def index():
          <h1>Welcome to the Climate API!</h1>
         <h2>Available Routes:</h2>
         <ul>
-            <li><a href="/api/v1.0/about">/api/v1.0/about</a></li>
-            <li><a href="/api/v1.0/contact">/api/v1.0/contact</a></li>
+            <li><a href="/about">/about</a></li>
+            <li><a href="/contact">/contact</a></li>
             <li><a href="/api/v1.0/precipitation">/api/v1.0/precipitation</a></li>
             <li><a href="/api/v1.0/stations">/api/v1.0/stations</a></li>
             <li><a href="/api/v1.0/tobs">/api/v1.0/tobs</a></li>
-            <li><a href="/api/v1.0/start_date">/api/v1.0/start_date</a></li>
-            <li><a href="/api/v1.0/start_end_date">/api/v1.0/start_end_date</a></li>
+            <li><a href="/api/v1.0/temp/<start>">/api/v1.0/<start></a></li>
+            <li><a href="/api/v1.0/temp/<start>/<end>">/api/v1.0/<start>/<end></a></li>
         </ul>
     """
 @app.route("/about")
