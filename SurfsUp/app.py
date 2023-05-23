@@ -41,8 +41,9 @@ app = Flask(__name__)
 @app.route("/")
 def index():
     return """ 
-         <h1>Welcome to Hawaii Weather API!</h1>
+        <h1>Welcome to Hawaii Weather API!</h1>
         <h2>Available Routes:</h2>
+        
         <ul>
             <li><a href="/about">/about</a></li>
             <li><a href="/contact">/contact</a></li>
