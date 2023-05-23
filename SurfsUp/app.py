@@ -92,6 +92,7 @@ def precipitation():
 # Define the stations route
 @app.route("/api/v1.0/stations")
 def stations():
+    
     session=Session(engine)
     # Query the list of stations
     results = session.query(Station.station).all()
@@ -127,8 +128,17 @@ def tobs():
     return jsonify(tobs_list)
 
 # Define the start and start/end date routes
+
 @app.route("/api/v1.0/<start>")
 def start(start):
+    session = Session(engine)
+    # Check if both start and end dates are in the correct format
+    try:
+        start_date = dt.datetime.strptime(start, "%Y-%m-%d").date()
+        
+    except ValueError:
+        return jsonify({"error": "Invalid date format. Please use:.../api/v1.0/ <YYYY-MM-DD>."}), 400
+
     result = session.query(func.min(Measurement.tobs), func.avg(Measurement.tobs),\
                                 func.max(Measurement.tobs)).filter(Measurement.date >= start).all()
     
@@ -148,8 +158,16 @@ def start(start):
     return jsonify({"error": f"No temperature data found for the specified start date '{start}'"}), 404
 
 
-@app.route('/api/v1.0/<start>/<end>')
-def start_end(start,end):
+@app.route("/api/v1.0/<start>/<end>")
+def start_end(start, end):
+    session = Session(engine)
+    # Check if both start and end dates are in the correct format
+    try:
+        start_date = dt.datetime.strptime(start, "%Y-%m-%d").date()
+        end_date = dt.datetime.strptime(end, "%Y-%m-%d").date()
+    except ValueError:
+        return jsonify({"error": "Invalid date format. Please use:.../api/v1.0/ <YYYY-MM-DD>/<YYYY-MM-DD>."}), 400
+
     queryresult = session.query(func.min(Measurement.tobs), func.avg(Measurement.tobs),\
                 func.max(Measurement.tobs)).filter(Measurement.date >= start).\
                 filter(Measurement.date <= end).all()
@@ -168,6 +186,7 @@ def start_end(start,end):
 
 # If no data is available, return an error message
     return jsonify({"error": f"No temperature data found for the specified start date '{start}' and end date '{end}'"}), 404
+
 
 # Run the server
 if __name__ == "__main__":
