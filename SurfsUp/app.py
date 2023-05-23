@@ -41,7 +41,7 @@ app = Flask(__name__)
 @app.route("/")
 def index():
     return """ 
-         <h1>Welcome to the Climate API!</h1>
+         <h1>Welcome to Hawaii Weather API!</h1>
         <h2>Available Routes:</h2>
         <ul>
             <li><a href="/about">/about</a></li>
@@ -62,7 +62,8 @@ def about():
     location = "Granite Bay"
     session.close()
 
-    return f"My name is {name}, and I live in {location}."
+    return f"My name is {name}, and I live in {location}. This website will give you the precipitation and temperature observations\
+        for the state of Hawaii between January 1, 2010 through August 23, 2017."
 
     
 @app.route("/contact")
